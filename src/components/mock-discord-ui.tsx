@@ -1,4 +1,5 @@
 import { PropsWithChildren } from "react"
+import Image from "next/image"
 import {
   Cog,
   Gift,
@@ -18,7 +19,6 @@ import {
 } from "lucide-react"
 
 import { Icons } from "./icons"
-import Image from "next/image"
 
 export const MockDiscordUI = ({ children, ...props }: PropsWithChildren) => {
   return (
