@@ -1,8 +1,9 @@
 "use client"
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
-import { client } from "../lib/client"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+
+import { client } from "@/lib/client"
 
 export const RecentPost = () => {
   const [name, setName] = useState<string>("")
@@ -31,7 +32,8 @@ export const RecentPost = () => {
       {isLoadingPosts ? (
         <p>Loading posts...</p>
       ) : recentPost ? (
-        <p className="truncate">Your most recent post: {recentPost.name}</p>
+        // <p className="truncate">Your most recent post: {recentPost.name}</p>
+        <p className="truncate">Your most recent post</p>
       ) : (
         <p>You have no posts yet.</p>
       )}
