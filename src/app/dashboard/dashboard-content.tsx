@@ -11,19 +11,20 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Modal } from "@/components/ui/modal"
 import { client } from "@/lib/client"
 
+import DashboardEmpty from "./dashboard-empty"
+
 export const DashboardContent = () => {
   const queryClient = useQueryClient()
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
-  const { data: dataCategories, isPending: isEventCategoriesLoading } =
-    useQuery({
-      queryKey: ["user-event-categories"],
-      queryFn: async () => {
-        const res = await client.category.getEventCategories.$get()
-        const { categories } = await res.json()
-        return categories
-      },
-    })
+  const { data: categoryData, isPending: isEventCategoriesLoading } = useQuery({
+    queryKey: ["user-event-categories"],
+    queryFn: async () => {
+      const res = await client.category.getEventCategories.$get()
+      const { categories } = await res.json()
+      return categories
+    },
+  })
 
   const { mutate: deleteCategory, isPending: isDeleteCategoryLoading } =
     useMutation({
@@ -44,14 +45,14 @@ export const DashboardContent = () => {
     )
   }
 
-  if (!dataCategories || dataCategories.length === 0) {
-    return <div>empty state</div>
+  if (!categoryData || categoryData.length === 0) {
+    return <DashboardEmpty />
   }
 
   return (
     <>
       <ul className="grid max-w-6xl grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {dataCategories?.map((category) => (
+        {categoryData?.map((category) => (
           <li
             key={category.id}
             className="relative group z-10 transition-all duration-200 hover:-translate-y-0.5"
