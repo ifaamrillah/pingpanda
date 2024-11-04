@@ -2,11 +2,15 @@ import { startOfMonth } from "date-fns"
 import { z } from "zod"
 
 import { db } from "@/db"
-import { EVENT_CATEGORY_VALIDATOR } from "@/lib/validators/category-validator"
+import {
+  CATEGORY_NAME_VALIDATOR,
+  EVENT_CATEGORY_VALIDATOR,
+} from "@/lib/validators/category-validator"
 import { parseColor } from "@/lib/utils"
 
 import { router } from "../__internals/router"
 import { privateProcedure } from "../procedures"
+import { HTTPException } from "hono/http-exception"
 
 export const categoryRouter = router({
   getEventCategories: privateProcedure.query(async ({ c, ctx }) => {
@@ -129,5 +133,65 @@ export const categoryRouter = router({
       })
 
       return json({ eventCategory })
+    }),
+  insetQuickstartCategories: privateProcedure.mutation(async ({ c, ctx }) => {
+    const { json } = c
+    const { user } = ctx
+
+    const categories = await db.eventCategory.createMany({
+      data: [
+        {
+          name: "Bug",
+          emoji: "🐛",
+          color: 0xff6b6b,
+        },
+        {
+          name: "Sale",
+          emoji: "💰",
+          color: 0xffeb3b,
+        },
+        {
+          name: "Question",
+          emoji: "🤔",
+          color: 0x6c5ce7,
+        },
+      ].map((category) => ({
+        ...category,
+        userId: user.id,
+      })),
+    })
+
+    return json({ success: true, count: categories.count })
+  }),
+  pollCategory: privateProcedure
+    .input(z.object({ name: CATEGORY_NAME_VALIDATOR }))
+    .query(async ({ c, ctx, input }) => {
+      const { json } = c
+      const { user } = ctx
+      const { name } = input
+
+      const category = await db.eventCategory.findUnique({
+        where: {
+          name_userId: {
+            name,
+            userId: user.id,
+          },
+        },
+        include: {
+          _count: {
+            select: {
+              events: true,
+            },
+          },
+        },
+      })
+      if (!category)
+        throw new HTTPException(404, {
+          message: `Category "${name}" not found`,
+        })
+
+      const hasEvents = category._count.events > 0
+
+      return json({ hasEvents })
     }),
 })
