@@ -8,8 +8,18 @@ import { DashboardWrapper } from "@/components/dashboard-wrapper"
 import { DashboardContent } from "./dashboard-content"
 import { CreateEventCategoryModal } from "@/components/create-event-category-modal"
 import { Button } from "@/components/ui/button"
+import { PaymentSuccessModal } from "@/components/payment-success-modal"
+import { createCheckoutSession } from "@/lib/stripe"
 
-export default async function DashboardPage() {
+interface DashboardPageProps {
+  searchParams: {
+    [key: string]: string | string[] | undefined
+  }
+}
+
+export default async function DashboardPage({
+  searchParams,
+}: DashboardPageProps) {
   const auth = await currentUser()
   if (!auth) redirect("/sign-in")
 
@@ -20,19 +30,34 @@ export default async function DashboardPage() {
   })
   if (!user) redirect("/sign-in")
 
+  const intent = searchParams.intent
+  if (intent === "upgrade") {
+    const session = await createCheckoutSession({
+      userEmail: user.email,
+      userId: user.id,
+    })
+
+    if (session.url) redirect(session.url)
+  }
+
+  const success = searchParams.success
+
   return (
-    <DashboardWrapper
-      title="Dashboard"
-      cta={
-        <CreateEventCategoryModal>
-          <Button className="w-full sm:w-fit">
-            <Plus className="size-4 mr-2" />
-            Add Category
-          </Button>
-        </CreateEventCategoryModal>
-      }
-    >
-      <DashboardContent />
-    </DashboardWrapper>
+    <>
+      {success ? <PaymentSuccessModal /> : null}
+      <DashboardWrapper
+        title="Dashboard"
+        cta={
+          <CreateEventCategoryModal>
+            <Button className="w-full sm:w-fit">
+              <Plus className="size-4 mr-2" />
+              Add Category
+            </Button>
+          </CreateEventCategoryModal>
+        }
+      >
+        <DashboardContent />
+      </DashboardWrapper>
+    </>
   )
 }
