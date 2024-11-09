@@ -38,7 +38,7 @@ const AccountSettingsContent = ({
       </div>
 
       <p className="t-2 text-sm/6 text-gray-600">
-        Don't know how to find your Discord ID?{" "}
+        Don&apos;t know how to find your Discord ID?{" "}
         <Link
           href="https://support.playhive.com/discord-user-id/"
           className="text-brand-600 hover:text-brand-500"

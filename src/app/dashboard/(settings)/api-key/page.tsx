@@ -4,9 +4,9 @@ import { currentUser } from "@clerk/nextjs/server"
 import { db } from "@/db"
 import { DashboardWrapper } from "@/components/dashboard-wrapper"
 
-import AccountSettingsContent from "./account-settings-content"
+import ApiKeySettingsContent from "./api-key-settings-content"
 
-export default async function AccountSettingsPage() {
+export default async function ApiKeyPage() {
   const auth = await currentUser()
 
   if (!auth) redirect("/sign-in")
@@ -20,8 +20,8 @@ export default async function AccountSettingsPage() {
   if (!user) redirect("/sign-in")
 
   return (
-    <DashboardWrapper title="Account Settings">
-      <AccountSettingsContent discordId={user.discordId ?? ""} />
+    <DashboardWrapper title="API Key">
+      <ApiKeySettingsContent apiKey={user.apiKey ?? ""} />
     </DashboardWrapper>
   )
 }
