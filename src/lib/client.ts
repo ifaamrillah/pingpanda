@@ -5,9 +5,7 @@ import { StatusCode } from "hono/utils/http-status"
 import superjson from "superjson"
 
 const getBaseUrl = () => {
-  return process.env.NODE_ENV === "development"
-    ? "http://localhost:3000/"
-    : "https://<YOUR_DEPLOYED_WORKER_URL>/"
+  return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
 }
 
 export const baseClient = hc<AppType>(getBaseUrl(), {
